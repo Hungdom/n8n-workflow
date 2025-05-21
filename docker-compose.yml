@@ -2,25 +2,38 @@ version: '3.8'
 
 services:
   n8n:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: n8nio/n8n:latest
     ports:
-      - "5678:5678"
+      - "8083:5678"
     environment:
       - N8N_HOST=${N8N_HOST:-localhost}
       - N8N_PORT=5678
       - N8N_PROTOCOL=${N8N_PROTOCOL:-http}
-      - N8N_USER_MANAGEMENT_DISABLED=${N8N_USER_MANAGEMENT_DISABLED:-false}
-      - N8N_BASIC_AUTH_ACTIVE=${N8N_BASIC_AUTH_ACTIVE:-false}
+      - N8N_USER_MANAGEMENT_DISABLED=false
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=${N8N_BASIC_AUTH_USER:-hung.le.m1@ctgroupvietnam.com}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_BASIC_AUTH_PASSWORD:-123456789}
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+      - N8N_SECURE_COOKIE=false
+      - N8N_COOKIE_SECURE=false
+      - N8N_COOKIE_SAME_SITE=Lax
       - DB_TYPE=postgresdb
       - DB_POSTGRESDB_HOST=postgres
       - DB_POSTGRESDB_PORT=5432
       - DB_POSTGRESDB_DATABASE=n8n
       - DB_POSTGRESDB_USER=n8n
       - DB_POSTGRESDB_PASSWORD=n8n
+      - N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE=true
     volumes:
-      - n8n_data:/home/node/.n8n
+      - ./.n8n:/home/node/.n8n:rw
+      - ./workflows:/home/node/.n8n/workflows:rw
+      - ./credentials:/home/node/.n8n/credentials:rw
+      - ./settings:/home/node/.n8n/settings:rw
+      - ./cache:/home/node/.n8n/cache:rw
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    user: "1000:1000"
     depends_on:
       - postgres
     restart: always
@@ -35,7 +48,7 @@ services:
       - POSTGRES_NON_ROOT_USER=n8n
       - POSTGRES_NON_ROOT_PASSWORD=n8n
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./postgres-data:/var/lib/postgresql/data
 
 volumes:
   n8n_data:

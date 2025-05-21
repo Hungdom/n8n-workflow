@@ -7,6 +7,18 @@ This repository contains Docker configuration for running n8n with PostgreSQL da
 - Docker
 - Docker Compose
 
+## Directory Structure
+
+```
+n8n/
+├── data/              # n8n data directory
+├── workflows/         # n8n workflows directory
+├── postgres-data/     # PostgreSQL data directory
+├── Dockerfile
+├── docker-compose.yml
+└── README.md
+```
+
 ## Configuration
 
 The setup uses the following default configuration:
@@ -50,11 +62,29 @@ You can configure n8n by setting the following environment variables:
 - `N8N_PROTOCOL`: The protocol to use (default: http)
 - `N8N_USER_MANAGEMENT_DISABLED`: Disable user management (default: false)
 - `N8N_BASIC_AUTH_ACTIVE`: Enable basic authentication (default: false)
+- `N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS`: Enforce correct file permissions (default: true)
 
 ## Data Persistence
 
-The setup includes two Docker volumes:
-- `n8n_data`: Stores n8n data
-- `postgres_data`: Stores PostgreSQL data
+The setup uses local directories for data persistence:
 
-These volumes ensure your data persists between container restarts. 
+- `./data`: Stores n8n general data
+- `./workflows`: Stores n8n workflows
+- `./postgres-data`: Stores PostgreSQL data
+
+These directories are mounted directly into the containers, ensuring your data persists between container restarts and is version controlled in your repository.
+
+## Workflow Management
+
+Your n8n workflows will be stored in the `workflows` directory. You can:
+1. Version control your workflows
+2. Share workflows between team members
+3. Backup workflows easily
+4. Deploy workflows to different environments
+
+## Security Notes
+
+- The setup uses a dedicated `n8n` user inside the container
+- File permissions are enforced for security
+- PostgreSQL data is stored in a separate volume
+- All sensitive data is stored in environment variables 
